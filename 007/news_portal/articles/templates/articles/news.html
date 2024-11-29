@@ -1,0 +1,67 @@
+{% extends "base_generic.html" %}
+{% block title %}Новости{% endblock %}
+{% block content %}
+<h2>Новости</h2>
+<form method="get" action="">
+    <label for="sort_by">Сортировать по:</label>
+    <select name="sort_by" id="sort_by">
+        {% for option in sort_options %}
+        <option value="{{ option.value }}" {% if request.GET.sort_by == option.value %}selected{% endif %}>
+            {{ option.label }}
+        </option>
+        {% endfor %}
+    </select>
+    <label for="sort_order">Направление сортировки:</label>
+    <select name="sort_order" id="sort_order">
+        {% for option in sort_orders %}
+        <option value="{{ option.value }}" {% if request.GET.sort_order == option.value %}selected{% endif %}>
+            {{ option.label }}
+        </option>
+        {% endfor %}
+    </select>
+    <label for="category">Категория:</label>
+    <select name="category" id="category">
+        <option value="">Все категории</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}" {% if request.GET.category|default:'' == category.id|stringformat:"i" %}selected{% endif %}>
+            {{ category.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Применить</button>
+    </form>
+    {% if request.user.is_authenticated %}
+    <h3>Подписка на категории</h3>
+    <form method="post">
+        {% csrf_token %}
+        <label for="subscription_category">Выберите категорию для подписки:</label>
+        <select name="category" id="subscription_category">
+        {% for category in categories %}
+            <option value="{{ category.id }}">
+            {{ category.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Подписаться</button>
+</form>
+<p>Вы подписаны на следующие категории:</p>
+<ul>
+    {% for category_name in subscribed_categories %}
+    <li>{{ category_name }}</li>
+    {% empty %}
+    <li>Нет подписок</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% for article in articles %}
+    <div>
+        <h3>{{ article.title }}</h3>
+        <p>{{ article.content }}</p>
+        <p>Автор: {{ article.author.username }} | Дата: {{ article.created_at }}</p>
+        <a href="{% url 'edit_article' article.pk %}">Редактировать</a>
+    </div>
+{% empty %}
+    <p>Нет статей.</p>
+{% endfor %}
+<a href="{% url 'article_create' %}">Создать новую статью</a>
+{% endblock %}

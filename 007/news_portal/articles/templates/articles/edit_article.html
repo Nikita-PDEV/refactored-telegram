@@ -1,0 +1,11 @@
+{% extends "base_generic.html" %}
+
+{% block content %}  
+  <h2>Редактировать статью</h2>  
+  <form method="post">  
+    {% csrf_token %}  
+    {{ form.as_p }}  
+    <button type="submit">Сохранить изменения</button>  
+  </form>  
+  <a href="{% url 'news' %}">Назад к новостям</a>  <!-- Ссылка для возврата на страницу новостей -->
+{% endblock %}
